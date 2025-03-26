@@ -1,97 +1,90 @@
-from flask import Flask, request, jsonify, Blueprint
-from sqlalchemy.orm import sessionmaker
-from .models import PublicationContact, 
-from .database import engine
 
-app = Flask(__name__)
-Session = sessionmaker(bind=engine)
-Base.metadata.create_all(engine)
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from services.publication_contact_service import (
+    insert_publication_contact,
+    get_publication_contact,
+    update_publication_contact,
+    delete_publication_contact
+)
+from dtos.publication_contact_dto import PublicationContactDTO  # Assuming you have a DTO for this
+from datetime import datetime
 
-publication_bp = Blueprint('publication_contacts', __name__)
+# Création du blueprint 'publication_contact'
+publication_contact_blueprint = Blueprint('publication_contact', __name__)
 
-@publication_bp.route('/', methods=['GET'])
-def get_publication_contacts():
-    session = Session()
-    contacts = session.query(PublicationContact).all()
-    session.close()
-    return jsonify([{
-        'publication': c.publication,
-        'lastname': c.lastname,
-        'firstname': c.firstname,
-        'type': c.type,
-        'value': c.value,
-        'id': c.id
-    } for c in contacts])
+class PublicationContactController:
 
-@publication_bp.route('/<string:publication>/<string:lastname>/<string:firstname>', methods=['GET'])
-def get_publication_contact(publication, lastname, firstname):
-    session = Session()
-    contact = session.query(PublicationContact).filter_by(
-        publication=publication, lastname=lastname, firstname=firstname
-    ).first()
-    session.close()
-    if contact:
-        return jsonify({
-            'publication': contact.publication,
-            'lastname': contact.lastname,
-            'firstname': contact.firstname,
-            'type': contact.type,
-            'value': contact.value,
-            'id': contact.id
-        })
-    return jsonify({'message': 'Contact not found'}), 404
+    @staticmethod
+    @publication_contact_blueprint.route('', methods=['POST'])
+    @jwt_required()  # Protéger la route avec l'authentification JWT
+    def create_publication_contact():
+        try:
+            # Récupérer les données de la requête JSON
+            data = request.get_json()
+            if not data:
+                return jsonify({'error': 'Invalid request, JSON required'}), 400
 
-@publication_bp.route('/', methods=['POST'])
-def create_publication_contact():
-    data = request.json
-    session = Session()
-    try:
-        new_contact = PublicationContact(
-            publication=data['publication'],
-            lastname=data['lastname'],
-            firstname=data['firstname'],
-            type=data['type'],
-            value=data['value'],
-            id=data['id']
-        )
-        session.add(new_contact)
-        session.commit()
-        return jsonify({'message': 'Contact created'}), 201
-    except Exception as e:
-        session.rollback()
-        return jsonify({'error': str(e)}), 400
-    finally:
-        session.close()
+            # Créer un DTO avec les données
+            publication_contact_dto = PublicationContactDTO(**data)
 
-@publication_bp.route('/<string:publication>/<string:lastname>/<string:firstname>', methods=['PUT'])
-def update_publication_contact(publication, lastname, firstname):
-    session = Session()
-    contact = session.query(PublicationContact).filter_by(
-        publication=publication, lastname=lastname, firstname=firstname
-    ).first()
-    if not contact:
-        return jsonify({'message': 'Contact not found'}), 404
-    data = request.json
-    contact.type = data.get('type', contact.type)
-    contact.value = data.get('value', contact.value)
-    session.commit()
-    session.close()
-    return jsonify({'message': 'Contact updated'})
+            # Appeler le service pour insérer dans la base de données
+            publication_contact = insert_publication_contact(publication_contact_dto)
 
-@publication_bp.route('/<string:publication>/<string:lastname>/<string:firstname>', methods=['DELETE'])
-def delete_publication_contact(publication, lastname, firstname):
-    session = Session()
-    contact = session.query(PublicationContact).filter_by(
-        publication=publication, lastname=lastname, firstname=firstname
-    ).first()
-    if not contact:
-        return jsonify({'message': 'Contact not found'}), 404
-    session.delete(contact)
-    session.commit()
-    session.close()
-    return jsonify({'message': 'Contact deleted'})
+            return jsonify({'message': 'Publication contact created successfully', 'publication_contact': publication_contact.to_dict()}), 201
 
-app.register_blueprint(publication_bp, url_prefix='/publication_contacts')
+        except Exception as e:
+            return jsonify({'error': 'An unexpected error occurred', 'details': str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    @staticmethod
+    @publication_contact_blueprint.route('/<string:publication>/<string:lastname>/<string:firstname>', methods=['GET'])
+    @jwt_required()
+    def get_publication_contact_by_id(publication, lastname, firstname):
+        try:
+            # Récupérer les informations de la publication à partir des paramètres
+            publication_contact = get_publication_contact(publication, lastname, firstname)
+
+            if not publication_contact:
+                return jsonify({'error': 'PublicationContact not found'}), 404
+
+            return jsonify({'publication_contact': publication_contact.to_dict()}), 200
+
+        except Exception as e:
+            return jsonify({'error': 'An unexpected error occurred', 'details': str(e)}), 500
+
+    @staticmethod
+    @publication_contact_blueprint.route('/<string:publication>/<string:lastname>/<string:firstname>', methods=['PUT'])
+    @jwt_required()
+    def update_publication_contact(publication, lastname, firstname):
+        try:
+            # Récupérer les données de la requête JSON
+            data = request.get_json()
+            if not data:
+                return jsonify({'error': 'Invalid request, JSON required'}), 400
+
+            # Créer un DTO avec les nouvelles données
+            publication_contact_dto = PublicationContactDTO(**data)
+
+            # Appeler le service pour mettre à jour la publication dans la base de données
+            updated_publication_contact = update_publication_contact(publication, lastname, firstname, publication_contact_dto)
+
+            return jsonify({'message': 'Publication contact updated successfully', 'publication_contact': updated_publication_contact.to_dict()}), 200
+
+        except Exception as e:
+            return jsonify({'error': 'An unexpected error occurred', 'details': str(e)}), 500
+
+    @staticmethod
+    @publication_contact_blueprint.route('/<string:publication>/<string:lastname>/<string:firstname>', methods=['DELETE'])
+    @jwt_required()
+    def delete_publication_contact(publication, lastname, firstname):
+        try:
+            # Appeler le service pour supprimer la publication dans la base de données
+            success = delete_publication_contact(publication, lastname, firstname)
+
+            if not success:
+                return jsonify({'error': 'PublicationContact not found'}), 404
+
+            return jsonify({'message': 'Publication contact deleted successfully'}), 200
+
+        except Exception as e:
+            return jsonify({'error': 'An unexpected error occurred', 'details': str(e)}), 500

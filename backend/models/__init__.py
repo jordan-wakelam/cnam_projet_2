@@ -29,7 +29,7 @@ def init_db():
     from models.publication_schedule import PublicationSchedule
     from models.schedule_times import ScheduleTimes
     from models.contact_info import ContactInfo
-    from models.publication_contact import PublicationContact
+    from backend.models.publication_contact_model import PublicationContact
     # If other models exist, un-comment their import lines:
     # from models.category_model import Category
     # from models.event_model import Event
