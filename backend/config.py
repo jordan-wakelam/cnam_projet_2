@@ -6,7 +6,7 @@ from typing import Optional
 
 # Charger les variables d'environnement depuis un fichier .env
 load_dotenv(
-    '.env.dev'
+    '.env'
 )  # Charge les variables d'environnement spécifiques au dev (si tu utilises un fichier .env.dev)
 
 limiter = Limiter(
@@ -23,7 +23,7 @@ class Config:
     Cette classe définit les paramètres de configuration par défaut pour l'application,
     y compris l'URI de la base de données, le mode de test et la clé secrète pour JWT.
     """
-    SQLALCHEMY_DATABASE_URI = "sqlite:///bd/exemple.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///db/exemple.db"
     TESTING = False
     JWT_SECRET_KEY = os.getenv(
         'JWT_SECRET_KEY',
