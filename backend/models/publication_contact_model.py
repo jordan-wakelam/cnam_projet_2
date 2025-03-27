@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship, mapped_column, Mapped
 from . import Base
 from typing import Optional
 from .contact_id_model import ContactId
-from .contact_info import ContactInfo
+from .contact_info_model import ContactInfo
 
 class PublicationContact(Base):
     __tablename__ = 'publication_contact'
