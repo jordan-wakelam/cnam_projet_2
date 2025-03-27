@@ -1,9 +1,9 @@
-
 from pydantic import BaseModel, Field, model_validator
 from typing import Optional
 from datetime import datetime
 import re
-from models import PublicationContact  # Importer le modèle PublicationContact de SQLAlchemy
+from models.publication_contact_model import PublicationContact  # Importer le modèle PublicationContact de SQLAlchemy
+
 
 class PublicationContactDTO(BaseModel):
     publication: str
@@ -28,13 +28,13 @@ class PublicationContactDTO(BaseModel):
             raise ValueError("Type must be at most 20 characters long.")
         return values
 
+
 # Exemple d'utilisation pour convertir un objet PublicationContact SQLAlchemy en DTO
-def publication_contact_to_dto(publication_contact: PublicationContact) -> PublicationContactDTO:
-    return PublicationContactDTO(
-        publication=publication_contact.publication,
-        lastname=publication_contact.lastname,
-        firstname=publication_contact.firstname,
-        type=publication_contact.type,
-        value=publication_contact.value,
-        id=publication_contact.id
-    )
+def publication_contact_to_dto(
+        publication_contact: PublicationContact) -> PublicationContactDTO:
+    return PublicationContactDTO(publication=publication_contact.publication,
+                                 lastname=publication_contact.lastname,
+                                 firstname=publication_contact.firstname,
+                                 type=publication_contact.type,
+                                 value=publication_contact.value,
+                                 id=publication_contact.id)

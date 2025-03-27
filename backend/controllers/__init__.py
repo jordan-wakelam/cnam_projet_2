@@ -1,6 +1,7 @@
 # from app.controllers.home_page_content_controller import home_page_content_blueprint
 from controllers.security_controller import security_blueprint
 from controllers.account_controller import account_blueprint
+from controllers.publication_contact_controller import publication_contact_blueprint
 
 
 def register_blueprints(app):
@@ -17,5 +18,7 @@ def register_blueprints(app):
         app (Flask): L'instance de l'application Flask dans laquelle les blueprints doivent être enregistrés.
     """
     # app.register_blueprint(category_blueprint, url_prefix='/category')
+    app.register_blueprint(publication_contact_blueprint,
+                           url_prefix='/publication_contact')
     app.register_blueprint(security_blueprint, url_prefix='/security')
     app.register_blueprint(account_blueprint, url_prefix='/account')

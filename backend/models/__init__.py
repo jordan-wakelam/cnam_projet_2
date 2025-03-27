@@ -26,10 +26,11 @@ def init_db():
     # Import all models here, make sure they are registered before creating the tables
     from models.token_model import Token
     from models.user_model import User
-    from backend.models.publication_schedule_model import PublicationSchedule
-    from backend.models.schedule_times_model import ScheduleTimes
-    from backend.models.contact_info_model import ContactInfo
-    from backend.models.publication_contact_model import PublicationContact
+    from models.publication_schedule_model import PublicationSchedule
+    # from models.schedule_times_model import ScheduleTimes
+    from models.contact_info_model import 
+    from models.publication_contact_model import PublicationContact
+    from models.contact_id_model import ContactId
     # If other models exist, un-comment their import lines:
     # from models.category_model import Category
     # from models.event_model import Event

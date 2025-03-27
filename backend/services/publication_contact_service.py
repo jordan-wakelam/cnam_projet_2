@@ -1,12 +1,12 @@
-
 from sqlalchemy.orm import Session
-from backend.models.publication_contact_model import PublicationContact  # Modèle PublicationContact
+from models.publication_contact_model import PublicationContact  # Modèle PublicationContact
 from dtos.publication_contact_dto import PublicationContactDTO  # DTO PublicationContact
 from models import create_session_local
 from datetime import datetime
 
 
-def insert_publication_contact(publication_contact_dto: PublicationContactDTO) -> PublicationContact:
+def insert_publication_contact(
+        publication_contact_dto: PublicationContactDTO) -> PublicationContact:
     """Insère une nouvelle entrée dans la table PublicationContact à partir d'un DTO.
 
     Args:
@@ -23,21 +23,25 @@ def insert_publication_contact(publication_contact_dto: PublicationContactDTO) -
             firstname=publication_contact_dto.firstname,
             type=publication_contact_dto.type,
             value=publication_contact_dto.value,
-            id=publication_contact_dto.id  # Supposons que l'ID de contact_info existe déjà
+            id=publication_contact_dto.
+            id  # Supposons que l'ID de contact_info existe déjà
         )
 
         session.add(new_publication_contact)
         session.commit()
-        session.refresh(new_publication_contact)  # Rafraîchir pour obtenir les valeurs actuelles
+        session.refresh(new_publication_contact
+                        )  # Rafraîchir pour obtenir les valeurs actuelles
         return new_publication_contact
     except Exception as e:
         session.rollback()
-        raise ValueError(f"Erreur lors de l'insertion de la publication contact : {str(e)}")
+        raise ValueError(
+            f"Erreur lors de l'insertion de la publication contact : {str(e)}")
     finally:
         session.close()  # Assurez-vous de fermer la session à la fin
 
 
-def get_publication_contact(publication: str, lastname: str, firstname: str) -> PublicationContact:
+def get_publication_contact(publication: str, lastname: str,
+                            firstname: str) -> PublicationContact:
     """Récupère un contact de publication en fonction de la publication, du nom et du prénom.
 
     Args:
@@ -51,21 +55,23 @@ def get_publication_contact(publication: str, lastname: str, firstname: str) -> 
     session = create_session_local()  # Créer une session locale
     try:
         publication_contact = session.query(PublicationContact).filter_by(
-            publication=publication,
-            lastname=lastname,
-            firstname=firstname
-        ).first()
+            publication=publication, lastname=lastname,
+            firstname=firstname).first()
 
         return publication_contact  # Retourner le contact de publication trouvé, ou None si pas trouvé.
 
     except Exception as e:
-        print(f"Erreur lors de la récupération du contact de publication : {str(e)}")
+        print(
+            f"Erreur lors de la récupération du contact de publication : {str(e)}"
+        )
         return None
     finally:
         session.close()  # Assurez-vous de fermer la session à la fin
 
 
-def update_publication_contact(publication: str, lastname: str, firstname: str, publication_contact_dto: PublicationContactDTO) -> PublicationContact:
+def update_publication_contact(
+        publication: str, lastname: str, firstname: str,
+        publication_contact_dto: PublicationContactDTO) -> PublicationContact:
     """Met à jour un contact de publication existant.
 
     Args:
@@ -81,13 +87,13 @@ def update_publication_contact(publication: str, lastname: str, firstname: str, 
     try:
         # Recherche de la publication_contact à mettre à jour
         publication_contact = session.query(PublicationContact).filter_by(
-            publication=publication,
-            lastname=lastname,
-            firstname=firstname
-        ).first()
+            publication=publication, lastname=lastname,
+            firstname=firstname).first()
 
         if not publication_contact:
-            raise ValueError(f"Contact de publication avec publication {publication}, lastname {lastname}, firstname {firstname} non trouvé.")
+            raise ValueError(
+                f"Contact de publication avec publication {publication}, lastname {lastname}, firstname {firstname} non trouvé."
+            )
 
         # Mise à jour des champs
         if publication_contact_dto.type:
@@ -99,19 +105,24 @@ def update_publication_contact(publication: str, lastname: str, firstname: str, 
 
         # Sauvegarde des modifications
         session.commit()
-        session.refresh(publication_contact)  # Rafraîchir l'objet pour obtenir les valeurs mises à jour
+        session.refresh(
+            publication_contact
+        )  # Rafraîchir l'objet pour obtenir les valeurs mises à jour
 
         return publication_contact  # Retourner le contact de publication mis à jour
 
     except Exception as e:
         session.rollback()
-        raise ValueError(f"Erreur lors de la mise à jour du contact de publication : {str(e)}")
+        raise ValueError(
+            f"Erreur lors de la mise à jour du contact de publication : {str(e)}"
+        )
 
     finally:
         session.close()  # Assurez-vous de fermer la session à la fin
 
 
-def delete_publication_contact(publication: str, lastname: str, firstname: str) -> bool:
+def delete_publication_contact(publication: str, lastname: str,
+                               firstname: str) -> bool:
     """Supprime un contact de publication de la base de données.
 
     Args:
@@ -125,20 +136,22 @@ def delete_publication_contact(publication: str, lastname: str, firstname: str) 
     session = create_session_local()  # Créer une session locale
     try:
         publication_contact = session.query(PublicationContact).filter_by(
-            publication=publication,
-            lastname=lastname,
-            firstname=firstname
-        ).first()
+            publication=publication, lastname=lastname,
+            firstname=firstname).first()
 
         if not publication_contact:
-            raise ValueError(f"Contact de publication avec publication {publication}, lastname {lastname}, firstname {firstname} non trouvé.")
+            raise ValueError(
+                f"Contact de publication avec publication {publication}, lastname {lastname}, firstname {firstname} non trouvé."
+            )
 
         session.delete(publication_contact)
         session.commit()
         return True  # Retourner True si la suppression est réussie
     except Exception as e:
         session.rollback()
-        print(f"Erreur lors de la suppression du contact de publication : {str(e)}")
+        print(
+            f"Erreur lors de la suppression du contact de publication : {str(e)}"
+        )
         return False
     finally:
         session.close()  # Assurez-vous de fermer la session à la fin
