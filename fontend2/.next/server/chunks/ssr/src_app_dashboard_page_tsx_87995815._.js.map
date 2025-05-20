@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/catia/OneDrive/Bureau/catia/cnam_projet_mairie/fontend2/src/app/dashboard/page.tsx"],"sourcesContent":[" 'use client';\r\n\r\nimport { useEffect } from 'react';\r\nimport { useRouter } from 'next/navigation';\r\nimport { isAuthenticated } from '@/utils/auth';\r\n\r\nexport default function DashboardPage() {\r\n  const router = useRouter();\r\n\r\n  useEffect(() => {\r\n    if (!isAuthenticated()) {\r\n      router.push('/login');\r\n    }\r\n  }, [router]);\r\n\r\n  return (\r\n    <div className=\"p-4\">\r\n      <h1 className=\"text-2xl font-bold\">Tableau de bord</h1>\r\n      <p>Bienvenue dans votre espace personnel.</p>\r\n    </div>\r\n  );\r\n}"],"names":[],"mappings":";;;;AAEA;AACA;AACA;AAJC;;;;;AAMc,SAAS;IACtB,MAAM,SAAS,CAAA,GAAA,kIAAA,CAAA,YAAS,AAAD;IAEvB,CAAA,GAAA,qMAAA,CAAA,YAAS,AAAD,EAAE;QACR,IAAI,CAAC,CAAA,GAAA,oHAAA,CAAA,kBAAe,AAAD,KAAK;YACtB,OAAO,IAAI,CAAC;QACd;IACF,GAAG;QAAC;KAAO;IAEX,qBACE,8OAAC;QAAI,WAAU;;0BACb,8OAAC;gBAAG,WAAU;0BAAqB;;;;;;0BACnC,8OAAC;0BAAE;;;;;;;;;;;;AAGT","debugId":null}}]
+}
